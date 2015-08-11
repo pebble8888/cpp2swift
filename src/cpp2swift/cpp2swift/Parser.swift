@@ -65,12 +65,11 @@ class Parser :NSObject {
         }
 
         let str1:String = sp_comma[0]
+        function.isStatic = (str1.rangeOfString("static") != nil)
         let str2:String = str1.stringByReplacingOccurrencesOfString("\n", withString:"")
         let str3:String = str2.stringByReplacingOccurrencesOfString("const", withString:"")
-
-
-        function.isStatic = (str3.rangeOfString("static") != nil)
-        let str:String = str3.stringByReplacingOccurrencesOfString("static", withString:"")
+        let str4:String = str3.stringByReplacingOccurrencesOfString("\t", withString: " ")
+        let str:String = str4.stringByReplacingOccurrencesOfString("static", withString:"")
 
         let sp = split(str, maxSplit: 256, allowEmptySlices: false,
             isSeparator: {(c:Character)->Bool in return c=="("||c==")"})

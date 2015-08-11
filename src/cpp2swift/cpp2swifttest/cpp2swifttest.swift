@@ -35,4 +35,10 @@ class cpp2swifttest: XCTestCase {
             "func GlobalReset() -> OSStatus\n{\nreturn AudioUnitReset (AU(), kAudioUnitScope_Global, 0);\n}\n"
         )
     }
+    
+    func test3() {
+        XCTAssertEqual(
+            _parser.parse("const \tCAComponent& \t Comp() const { return mComp; }"),
+                "func Comp() -> CAComponent&\n{ return mComp; }\n" )
+    }
 }
