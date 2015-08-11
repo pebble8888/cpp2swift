@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <XCTest/XCTest.h>
+#import "cpp2swift-Swift.h"
 
 @interface cpp2swifttest : XCTestCase
 
@@ -25,6 +26,10 @@
 
 - (void)testExample {
     XCTAssert(YES, @"Pass");
+    
+    Parser* parser = [[Parser alloc] init];
+    NSString* str = [parser parse:@"static OSStatusOpen (const CAComponent& inComp, CAAudioUnit &outUnit);"];
+    NSLog(@"str[%@]");
 }
 
 @end
