@@ -23,7 +23,7 @@ class cpp2swifttest: XCTestCase {
     func test1() {
         XCTAssertEqual(
             _parser.parse("static OSStatus  Open (const CAComponent& inComp, CAAudioUnit &outUnit);"),
-            "static func Open(inComp:CAComponent&, &outUnit:CAAudioUnit) -> OSStatus")
+            "static func Open(inComp:CAComponent&, &outUnit:CAAudioUnit) -> OSStatus\n")
     }
     
     func test2() {
@@ -40,5 +40,28 @@ class cpp2swifttest: XCTestCase {
         XCTAssertEqual(
             _parser.parse("const \tCAComponent& \t Comp() const { return mComp; }"),
                 "func Comp() -> CAComponent&\n{ return mComp; }\n" )
+    }
+    
+    func test4() {
+        XCTAssertEqual(
+            _parser.parse( "void function1(void);"),
+            "func function1()\n"
+        )
+    }
+    
+    func test5() {
+        XCTAssertEqual(
+            _parser.parse(
+            "void function1(void);\n" +
+            "void function2(void){hoge;}\n" +
+            "void function3(void){fuga;}\n" +
+            "void function4(void);\n"),
+            
+            "func function1()\n" +
+            "func function2()\n" +
+            "{hoge;}\n" +
+            "func function3()\n" +
+            "{fuga;}\n" +
+            "func function4()\n")
     }
 }

@@ -3,12 +3,13 @@
 //  cpp2swift
 //
 //  Created by pebble8888 on 2015/08/11.
-//  Copyright (c) 2015年 pebble8888. All rights reserved.
+//  Copyright (c) 2015 pebble8888. All rights reserved.
 //
 
 import Foundation
 
 class Parser :NSObject {
+    var _functions:[Function] = []
     struct Function {
         var funcName:String!
         var returnTypeName:String!      // nil means Void
@@ -44,9 +45,14 @@ class Parser :NSObject {
                         }
                     })
                     str += addstr
-                    str += ") -> " + returnTypeName1
+                    str += ")"
+                    if returnTypeName1 != "void" {
+                        str += " -> " + returnTypeName1
+                    }
                     if body != nil {
                         str += "\n{" + body + "}\n"
+                    } else {
+                        str += "\n"
                     }
                     return str
                 }
@@ -54,19 +60,70 @@ class Parser :NSObject {
             return ""
         }
     }
+    
+    
     func parse(string:String) -> String
     {
-        var function:Function = Function()
+        let str:String = string
         
-        let sp_comma = split(string, maxSplit: 256, allowEmptySlices: false,
-            isSeparator: {(c:Character)->Bool in return c=="{"||c=="}"})
-        if sp_comma.count >= 2 {
-            function.body = sp_comma[1]
+        var i:String.Index = str.startIndex
+        var pin:String.Index = str.startIndex
+        while i < str.endIndex {
+            while i < str.endIndex {
+                if str[i] == ";" {
+                    
+                    var function:Function = Function()
+                    let r:Range = Range(start:pin, end:i)
+                    let one = str.substringWithRange(r)
+                    parse_onefunction_and_push(one, function: &function)
+                    _functions.append(function)
+                    
+                    ++i
+                    
+                    break
+                } else if str[i] == "{" {
+                    
+                    let r:Range = Range(start:pin, end:i)
+                    let one = str.substringWithRange(r)
+                    
+                    var function:Function = Function()
+                    
+                    if let r = str.rangeOfString("}",
+                        options: NSStringCompareOptions.LiteralSearch,
+                        range:Range(start: i,end: str.endIndex))
+                    {
+                        function.body = str.substringWithRange(Range(start: i.successor(), end: r.startIndex))
+                        i = r.endIndex
+                    } else {
+                        // 対応する}が見つからずおかしいがここで一旦区切る。
+                    }
+                    parse_onefunction_and_push(one, function: &function)
+                    _functions.append(function)
+                    break
+                } else {
+                    ++i
+                }
+            }
+            
+            pin = i
         }
-
-        let str1:String = sp_comma[0]
-        function.isStatic = (str1.rangeOfString("static") != nil)
-        let str2:String = str1.stringByReplacingOccurrencesOfString("\n", withString:"")
+       
+        return _functions.map({
+            (function: Function) -> String in
+                return function.output
+            }).reduce("", combine: {
+                if $0 == "" {
+                    return $1
+                } else {
+                    return $0 + $1
+                }
+            })
+    }
+    
+    func parse_onefunction_and_push(string:String, inout function:Function)
+    {
+        function.isStatic = (string.rangeOfString("static") != nil)
+        let str2:String = string.stringByReplacingOccurrencesOfString("\n", withString:"")
         let str3:String = str2.stringByReplacingOccurrencesOfString("const", withString:"")
         let str4:String = str3.stringByReplacingOccurrencesOfString("\t", withString: " ")
         let str:String = str4.stringByReplacingOccurrencesOfString("static", withString:"")
@@ -92,6 +149,9 @@ class Parser :NSObject {
         if sp.count >= 2 {
             let sp2 = split(sp[1], maxSplit: 256, allowEmptySlices: false,
                 isSeparator: {(c:Character)->Bool in return c==","})
+            if sp2.count > 0 && sp2[0] == "void" {
+                return
+            }
             for el2 in sp2 {
                 let el21 = el2.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
                 var sp3 = split(el21, maxSplit: 256, allowEmptySlices: false,
@@ -112,7 +172,5 @@ class Parser :NSObject {
                 }
             }
         }
-
-        return function.output
     }
 }
