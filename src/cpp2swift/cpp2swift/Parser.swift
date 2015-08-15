@@ -19,10 +19,19 @@ class Parser :NSObject {
             var output: String {
                 if let l_varName = varName {
                     if let l_typeName = typeName {
-                        return l_varName + ":" + l_typeName
+                        return l_varName + ":" + Function.convertType(l_typeName)
                     }
                 }
                 return ""
+            }
+        }
+        static func convertType(cppType:String) -> String
+        {
+            let typeCorrespondings = ["bool":"Bool",]
+            if let swiftType = typeCorrespondings[cppType] {
+                return swiftType
+            } else {
+                return cppType
             }
         }
         var isStatic:Bool = false
@@ -47,7 +56,7 @@ class Parser :NSObject {
                     str += addstr
                     str += ")"
                     if returnTypeName1 != "void" {
-                        str += " -> " + returnTypeName1
+                        str += " -> " + Function.convertType(returnTypeName1)
                     }
                     if body != nil {
                         str += "\n{" + body + "}\n"

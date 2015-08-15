@@ -49,6 +49,13 @@ class cpp2swifttest: XCTestCase {
         )
     }
     
+    func test41() {
+        XCTAssertEqual(
+            _parser.parse( "bool function1(bool flag);"),
+            "func function1(flag:Bool) -> Bool\n"
+        )
+    }
+    
     func test5() {
         XCTAssertEqual(
             _parser.parse(
