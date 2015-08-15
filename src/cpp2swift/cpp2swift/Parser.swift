@@ -74,48 +74,11 @@ class Parser :NSObject {
     
     func parse(string:String) -> String
     {
-        let str:String = string
-        
-        var i:String.Index = str.startIndex
-        var pin:String.Index = str.startIndex
-        while i < str.endIndex {
-            while i < str.endIndex {
-                if str[i] == ";" {
-                    
-                    var function:Function = Function()
-                    let r:Range = Range(start:pin, end:i)
-                    let one = str.substringWithRange(r)
-                    parse_onefunction_and_push(one, function: &function)
-                    _functions.append(function)
-                    
-                    ++i
-                    
-                    break
-                } else if str[i] == "{" {
-                    
-                    let r:Range = Range(start:pin, end:i)
-                    let one = str.substringWithRange(r)
-                    
-                    var function:Function = Function()
-                    
-                    if let r = str.rangeOfString("}",
-                        options: NSStringCompareOptions.LiteralSearch,
-                        range:Range(start: i,end: str.endIndex))
-                    {
-                        function.body = str.substringWithRange(Range(start: i.successor(), end: r.startIndex))
-                        i = r.endIndex
-                    } else {
-                        // 対応する}が見つからずおかしいがここで一旦区切る。
-                    }
-                    parse_onefunction_and_push(one, function: &function)
-                    _functions.append(function)
-                    break
-                } else {
-                    ++i
-                }
-            }
-            
-            pin = i
+        for definition in CppSequence(text:string) {
+            var function:Function = Function()
+            function.body = definition.body
+            parse_onefunction_and_push(definition.head!, function: &function)
+            _functions.append(function)
         }
        
         return _functions.map({
