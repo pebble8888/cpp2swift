@@ -27,7 +27,8 @@ class Parser :NSObject {
         }
         static func convertType(cppType:String) -> String
         {
-            let typeCorrespondings = ["bool":"Bool",]
+            let typeCorrespondings = ["bool":"Bool",
+                "int":"Int"]
             if let swiftType = typeCorrespondings[cppType] {
                 return swiftType
             } else {
