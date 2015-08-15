@@ -41,7 +41,7 @@ class Parser :NSObject {
                         if $0 == "" {
                             return $1.output
                         } else {
-                            return $0 + ", " + $1.output
+                            return $0 + ",\n" + $1.output
                         }
                     })
                     str += addstr

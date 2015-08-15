@@ -10,13 +10,12 @@ var pin:String.Index = str.endIndex
 while i < str.endIndex {
     while i < str.endIndex {
         if str[i] == ";" {
-            //println( str[i] )
-            
             break
         } else {
             ++i
         }
     }
-    let aa = str.substringWithRange(Range(pin,i))
+    let aa = str.substringWithRange(Range(start:pin, end:i))
+    
     pin = i
 }

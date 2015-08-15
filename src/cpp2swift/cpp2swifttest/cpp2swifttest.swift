@@ -23,7 +23,7 @@ class cpp2swifttest: XCTestCase {
     func test1() {
         XCTAssertEqual(
             _parser.parse("static OSStatus  Open (const CAComponent& inComp, CAAudioUnit &outUnit);"),
-            "static func Open(inComp:CAComponent&, &outUnit:CAAudioUnit) -> OSStatus\n")
+            "static func Open(inComp:CAComponent&,\n&outUnit:CAAudioUnit) -> OSStatus\n")
     }
     
     func test2() {
