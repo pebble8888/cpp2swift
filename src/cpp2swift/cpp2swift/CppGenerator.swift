@@ -55,6 +55,7 @@ class CppGenerator : GeneratorType
                     _definitions.append(Element(head: one))
                     
                     ++i
+                    pin = i
                     
                     break
                 } else if str[i] == "{" {
@@ -74,13 +75,18 @@ class CppGenerator : GeneratorType
                         // 対応する}が見つからずおかしいがここで一旦区切る。
                     }
                     _definitions.append(definition)
+                    pin = i
                     break
                 } else {
                     ++i
                 }
             }
-            
-            pin = i
+            if pin < i {
+                let r:Range = Range(start:pin, end:i)
+                let one = str.substringWithRange(r)
+                _definitions.append(Element(head:one))
+                pin = i
+            }
         }
     }
 }

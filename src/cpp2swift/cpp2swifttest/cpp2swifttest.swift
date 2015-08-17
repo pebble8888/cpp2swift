@@ -71,4 +71,10 @@ class cpp2swifttest: XCTestCase {
             "{fuga;}\n" +
             "func function4()\n")
     }
+    
+    func test6() {
+        XCTAssertEqual(
+            _parser.parse("int function1()"),
+            "func function1() -> Int\n")
+    }
 }
