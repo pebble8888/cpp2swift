@@ -23,12 +23,12 @@ class cpp2swifttest_definition: XCTestCase {
         
         var str = "Hello;cat;hoge{mama}fuga{papa}dog;parot"
         
-        var gen:CppGenerator = CppGenerator(text:str)
+        var generator:CppHeaderGenerator = CppHeaderGenerator(text:str)
        
-        var ele:CppGenerator.Definition! = gen.next()
-        while ele != nil {
-            println(ele.description)
-            ele = gen.next()
+        var element:CppHeaderGenerator.Paragraph! = generator.next()
+        while element != nil {
+            println(element.description)
+            element = generator.next()
         }
     }
 

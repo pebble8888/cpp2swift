@@ -10,10 +10,10 @@
 		A21576131B7A22D200EEAF30 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21576121B7A22D200EEAF30 /* Parser.swift */; };
 		A23CACA41B7A2DFD00BF9648 /* cpp2swifttest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23CACA31B7A2DFD00BF9648 /* cpp2swifttest.swift */; };
 		A23CACA81B7A2E7E00BF9648 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21576121B7A22D200EEAF30 /* Parser.swift */; };
-		A2A10F751B7F349900F0E5C3 /* CppGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A10F741B7F349900F0E5C3 /* CppGenerator.swift */; };
-		A2A10F761B7F3A8900F0E5C3 /* CppGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A10F741B7F349900F0E5C3 /* CppGenerator.swift */; };
-		A2A10F781B7F3E6D00F0E5C3 /* CppSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A10F771B7F3E6D00F0E5C3 /* CppSequence.swift */; };
-		A2A10F791B7F437000F0E5C3 /* CppSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A10F771B7F3E6D00F0E5C3 /* CppSequence.swift */; };
+		A2A10F751B7F349900F0E5C3 /* CppHeaderGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A10F741B7F349900F0E5C3 /* CppHeaderGenerator.swift */; };
+		A2A10F761B7F3A8900F0E5C3 /* CppHeaderGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A10F741B7F349900F0E5C3 /* CppHeaderGenerator.swift */; };
+		A2A10F781B7F3E6D00F0E5C3 /* CppHeaderSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A10F771B7F3E6D00F0E5C3 /* CppHeaderSequence.swift */; };
+		A2A10F791B7F437000F0E5C3 /* CppHeaderSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2A10F771B7F3E6D00F0E5C3 /* CppHeaderSequence.swift */; };
 		A2DD63E71B7EF0F6008E62AC /* cpp2swifttest_definition.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2DD63E61B7EF0F6008E62AC /* cpp2swifttest_definition.swift */; };
 		A2E161681B79C2840085036A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2E161671B79C2840085036A /* main.swift */; };
 /* End PBXBuildFile section */
@@ -45,8 +45,8 @@
 		A23CAC9F1B7A2DFC00BF9648 /* cpp2swifttest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = cpp2swifttest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A23CACA21B7A2DFD00BF9648 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A23CACA31B7A2DFD00BF9648 /* cpp2swifttest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = cpp2swifttest.swift; sourceTree = "<group>"; };
-		A2A10F741B7F349900F0E5C3 /* CppGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CppGenerator.swift; sourceTree = "<group>"; };
-		A2A10F771B7F3E6D00F0E5C3 /* CppSequence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CppSequence.swift; sourceTree = "<group>"; };
+		A2A10F741B7F349900F0E5C3 /* CppHeaderGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CppHeaderGenerator.swift; sourceTree = "<group>"; };
+		A2A10F771B7F3E6D00F0E5C3 /* CppHeaderSequence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CppHeaderSequence.swift; sourceTree = "<group>"; };
 		A2BC653F1B7EEC9C00B51DCC /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
 		A2DD63E61B7EF0F6008E62AC /* cpp2swifttest_definition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = cpp2swifttest_definition.swift; sourceTree = "<group>"; };
 		A2E161641B79C2840085036A /* cpp2swift */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cpp2swift; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,8 +113,8 @@
 			children = (
 				A2E161671B79C2840085036A /* main.swift */,
 				A21576121B7A22D200EEAF30 /* Parser.swift */,
-				A2A10F741B7F349900F0E5C3 /* CppGenerator.swift */,
-				A2A10F771B7F3E6D00F0E5C3 /* CppSequence.swift */,
+				A2A10F741B7F349900F0E5C3 /* CppHeaderGenerator.swift */,
+				A2A10F771B7F3E6D00F0E5C3 /* CppHeaderSequence.swift */,
 			);
 			path = cpp2swift;
 			sourceTree = "<group>";
@@ -224,8 +224,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A2A10F791B7F437000F0E5C3 /* CppSequence.swift in Sources */,
-				A2A10F761B7F3A8900F0E5C3 /* CppGenerator.swift in Sources */,
+				A2A10F791B7F437000F0E5C3 /* CppHeaderSequence.swift in Sources */,
+				A2A10F761B7F3A8900F0E5C3 /* CppHeaderGenerator.swift in Sources */,
 				A2DD63E71B7EF0F6008E62AC /* cpp2swifttest_definition.swift in Sources */,
 				A23CACA81B7A2E7E00BF9648 /* Parser.swift in Sources */,
 				A23CACA41B7A2DFD00BF9648 /* cpp2swifttest.swift in Sources */,
@@ -236,9 +236,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A2A10F781B7F3E6D00F0E5C3 /* CppSequence.swift in Sources */,
+				A2A10F781B7F3E6D00F0E5C3 /* CppHeaderSequence.swift in Sources */,
 				A21576131B7A22D200EEAF30 /* Parser.swift in Sources */,
-				A2A10F751B7F349900F0E5C3 /* CppGenerator.swift in Sources */,
+				A2A10F751B7F349900F0E5C3 /* CppHeaderGenerator.swift in Sources */,
 				A2E161681B79C2840085036A /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

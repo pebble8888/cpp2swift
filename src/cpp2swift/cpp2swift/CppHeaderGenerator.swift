@@ -1,5 +1,5 @@
 //
-//  CppGenerator.swift
+//  CppHeaderGenerator.swift
 //
 //  Created by pebble8888 on 2015/08/15.
 //  Copyright (c) 2015 pebble8888. All rights reserved.
@@ -7,9 +7,9 @@
 
 import Foundation
 
-class CppGenerator : GeneratorType
+class CppHeaderGenerator : GeneratorType
 {
-    struct Definition:Printable {
+    struct Paragraph:Printable {
         var head:String?
         var body:String?
         init(head:String?, body:String? = nil){
@@ -29,17 +29,20 @@ class CppGenerator : GeneratorType
             }
         }
     }
-    typealias Element = Definition // GeneratorTypeのプロトコル付属型をDefinitionに設定する
+    typealias Element = Paragraph // GeneratorTypeのプロトコル付属型を設定する
     
-    private var _definitions: [Definition] = []
+    private var _paragraphs: [Paragraph] = []
     
     func next() -> Element? {
-        if _definitions.isEmpty {
+        if _paragraphs.isEmpty {
             return nil
         }
-        return _definitions.removeAtIndex(0)
+        return _paragraphs.removeAtIndex(0)
     }
     
+    /**
+     @brief C++のヘッダファイル部のコードを関数単位で区切り、_paragraphsに分割してセットする。
+     */
     init(text:String){
         
         let str:String = text
@@ -52,7 +55,7 @@ class CppGenerator : GeneratorType
                     
                     let r:Range = Range(start:pin, end:i)
                     let one = str.substringWithRange(r)
-                    _definitions.append(Element(head: one))
+                    _paragraphs.append(Element(head: one))
                     
                     ++i
                     pin = i
@@ -63,7 +66,7 @@ class CppGenerator : GeneratorType
                     let r:Range = Range(start:pin, end:i)
                     let one = str.substringWithRange(r)
                     
-                    var definition:Definition = Definition(head:one)
+                    var definition:Paragraph = Paragraph(head:one)
                     
                     if let r = str.rangeOfString("}",
                         options: NSStringCompareOptions.LiteralSearch,
@@ -74,7 +77,7 @@ class CppGenerator : GeneratorType
                     } else {
                         // 対応する}が見つからずおかしいがここで一旦区切る。
                     }
-                    _definitions.append(definition)
+                    _paragraphs.append(definition)
                     pin = i
                     break
                 } else {
@@ -84,7 +87,7 @@ class CppGenerator : GeneratorType
             if pin < i {
                 let r:Range = Range(start:pin, end:i)
                 let one = str.substringWithRange(r)
-                _definitions.append(Element(head:one))
+                _paragraphs.append(Element(head:one))
                 pin = i
             }
         }

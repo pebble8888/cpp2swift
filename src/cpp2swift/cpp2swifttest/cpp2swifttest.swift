@@ -28,11 +28,16 @@ class cpp2swifttest: XCTestCase {
     
     func test2() {
         XCTAssertEqual(
-            _parser.parse("OSStatus  GlobalReset ()\n" +
+            _parser.parse(
+                "OSStatus  GlobalReset ()\n" +
                 "{\n" +
                 "return AudioUnitReset (AU(), kAudioUnitScope_Global, 0);\n" +
                 "}\n" ),
-            "func GlobalReset() -> OSStatus\n{\nreturn AudioUnitReset (AU(), kAudioUnitScope_Global, 0);\n}\n"
+                
+                "func GlobalReset() -> OSStatus\n" + 
+                "{\n" +
+                "return AudioUnitReset (AU(), kAudioUnitScope_Global, 0);\n" + 
+                "}\n"
         )
     }
     

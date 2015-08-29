@@ -10,13 +10,17 @@ import Foundation
 
 class Parser :NSObject {
     var _functions:[Function] = []
+    
+    // function
     struct Function {
-        var funcName:String!
-        var returnTypeName:String!      // nil means Void
+        var funcName:String!            ///< function name
+        var returnTypeName:String!      ///< return type name of function, nil means 'Void'
+        // function argument
         struct Arg {
-            var typeName:String!
-            var varName:String!
-            var output: String {
+            var typeName:String!        ///< the type name of the argument
+            var varName:String!         ///< the variable name of the argument
+            var output: String          ///< swift type definition string of the function argument
+            {
                 if let l_varName = varName {
                     if let l_typeName = typeName {
                         return l_varName + ":" + Function.convertType(l_typeName)
@@ -25,6 +29,7 @@ class Parser :NSObject {
                 return ""
             }
         }
+        //
         static func convertType(cppType:String) -> String
         {
             let typeCorrespondings = ["bool":"Bool",
@@ -35,11 +40,12 @@ class Parser :NSObject {
                 return cppType
             }
         }
-        var isStatic:Bool = false
-        var args:[Arg] = []
-        var body:String!
+        var isStatic:Bool = false   ///< whether the function is static or not
+        var args:[Arg] = []         ///< arguments of the function
+        var body:String!            ///< implementation of the function
         
-        var output: String {
+        var output: String          ///< swift function string
+        {
             if let funcName1 = funcName {
                 if let returnTypeName1 = returnTypeName {
                     var str:String = ""
@@ -71,10 +77,13 @@ class Parser :NSObject {
         }
     }
     
-    
+    /**
+     @param  string:String  C++ code string
+     @return String         swift code String
+     */
     func parse(string:String) -> String
     {
-        for definition in CppSequence(text:string) {
+        for definition in CppHeaderSequence(text:string) {
             var function:Function = Function()
             function.body = definition.body
             parse_onefunction_and_push(definition.head!, function: &function)
@@ -93,6 +102,9 @@ class Parser :NSObject {
             })
     }
     
+    /**
+     @brief
+     */
     func parse_onefunction_and_push(string:String, inout function:Function)
     {
         function.isStatic = (string.rangeOfString("static") != nil)
