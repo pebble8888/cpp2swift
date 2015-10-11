@@ -21,13 +21,13 @@ class cpp2swifttest_definition: XCTestCase {
 
     func test1() {
         
-        var str = "Hello;cat;hoge{mama}fuga{papa}dog;parot"
+        let str = "Hello;cat;hoge{mama}fuga{papa}dog;parot"
         
-        var gen:CppGenerator = CppGenerator(text:str)
+        let gen:CppGenerator = CppGenerator(text:str)
        
         var ele:CppGenerator.Definition! = gen.next()
         while ele != nil {
-            println(ele.description)
+            print(ele.description)
             ele = gen.next()
         }
     }

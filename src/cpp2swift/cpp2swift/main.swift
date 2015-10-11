@@ -9,7 +9,7 @@
 import Foundation
 
 if Process.argc != 1 {
-    println("Usage: cpp2swift")
+    print("Usage: cpp2swift")
     exit(-1)
 }
 
@@ -23,5 +23,10 @@ if g_inputString == nil {
 
 let g_str:String = g_inputString as String!
 
-var g_parser:Parser = Parser()
-println(g_parser.parse(g_str))
+//var g_parser:Parser = Parser()
+//print(g_parser.parse(g_str))
+var g_tokenizer = Tokenizer()
+g_tokenizer.parse(g_str)
+var g_cppAnalyzer = CPPAnalyzer()
+//g_cppAnalyzer.analyze(g_tokenizer.stack)
+g_cppAnalyzer.analyze(&g_tokenizer.stack)

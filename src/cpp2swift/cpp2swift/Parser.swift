@@ -39,6 +39,7 @@ class Parser :NSObject {
         var args:[Arg] = []
         var body:String!
         
+        /*
         var output: String {
             if let funcName1 = funcName {
                 if let returnTypeName1 = returnTypeName {
@@ -69,15 +70,17 @@ class Parser :NSObject {
             }
             return ""
         }
+        */
     }
     
     
+    /*
     func parse(string:String) -> String
     {
         for definition in CppSequence(text:string) {
             var function:Function = Function()
             function.body = definition.body
-            parse_onefunction_and_push(definition.head!, function: &function)
+            //parse_onefunction_and_push(definition.head!, function: &function)
             _functions.append(function)
         }
        
@@ -92,7 +95,9 @@ class Parser :NSObject {
                 }
             })
     }
+    */
     
+    /*
     func parse_onefunction_and_push(string:String, inout function:Function)
     {
         function.isStatic = (string.rangeOfString("static") != nil)
@@ -101,12 +106,12 @@ class Parser :NSObject {
         let str4:String = str3.stringByReplacingOccurrencesOfString("\t", withString: " ")
         let str:String = str4.stringByReplacingOccurrencesOfString("static", withString:"")
 
-        let sp = split(str, maxSplit: 256, allowEmptySlices: false,
-            isSeparator: {(c:Character)->Bool in return c=="("||c==")"})
+        let sp = str.characters.split(allowEmptySlices: false,
+            isSeparator: {(c:Character)->Bool in return c=="("||c==")"}).map { String($0) }
 
         if sp.count >= 1 {
-            let sp1 = split(sp[0], maxSplit: 256, allowEmptySlices: false,
-                isSeparator: {(c:Character)->Bool in return c==" "})
+            let sp1 = sp[0].characters.split(allowEmptySlices: false,
+                isSeparator: {(c:Character)->Bool in return c==" "}).map { String($0) }
             if sp1.count >= 1 {
                 let el = sp1[0]
                 let el1 = el.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
@@ -120,15 +125,15 @@ class Parser :NSObject {
         }
 
         if sp.count >= 2 {
-            let sp2 = split(sp[1], maxSplit: 256, allowEmptySlices: false,
-                isSeparator: {(c:Character)->Bool in return c==","})
+            let sp2 = sp[1].characters.split(allowEmptySlices: false,
+                isSeparator: {(c:Character)->Bool in return c==","}).map { String($0) }
             if sp2.count > 0 && sp2[0] == "void" {
                 return
             }
             for el2 in sp2 {
                 let el21 = el2.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-                var sp3 = split(el21, maxSplit: 256, allowEmptySlices: false,
-                    isSeparator: {(c:Character)->Bool in return c==" "})
+                var sp3 = el21.characters.split(allowEmptySlices: false,
+                    isSeparator: {(c:Character)->Bool in return c==" "}).map { String($0) }
                 if sp3.count > 0 {
                     var arg:Function.Arg = Function.Arg()
                     arg.varName = sp3.last
@@ -146,4 +151,5 @@ class Parser :NSObject {
             }
         }
     }
+    */
 }

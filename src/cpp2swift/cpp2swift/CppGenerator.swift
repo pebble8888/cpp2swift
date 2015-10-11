@@ -9,7 +9,7 @@ import Foundation
 
 class CppGenerator : GeneratorType
 {
-    struct Definition:Printable {
+    struct Definition:CustomStringConvertible {
         var head:String?
         var body:String?
         init(head:String?, body:String? = nil){
