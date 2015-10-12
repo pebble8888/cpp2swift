@@ -234,58 +234,43 @@ enum TokenGeneratorError : ErrorType
 class TokenGenerator {
     private var stack:[Token] = []
     private var index: Int = 0
-    private var peekindex : Int = 0
     init(stack:[Token]) {
         self.stack = stack
     }
     var currentIndex: Int {
         return index
     }
-    /*
-    func current() throws -> Token {
-        if index >= stack.count {
-            throw TokenGeneratorError.IndexError
-        }
-        return stack[index] 
-    }
-    */
-    func nextBare() throws -> Token {
-        if index >= stack.count {
+    func nextBare(stride:Int = 1) throws -> Token {
+        if index + stride >= stack.count {
             throw TokenGeneratorError.IndexError 
         }
         let l_index:Int = index
-        ++index
-        resetPeek()
+        index += stride
         return stack[l_index]
     }
-    func next() throws -> Token {
-        let token = try nextBare() 
+    func next(stride:Int = 1) throws -> Token {
+        let token = try nextBare(stride) 
         switch token.type {
         case .WhiteSpace, .LF:
-            return try next()
+            return try next(stride)
         default:
             return token
         }
     }
-    func nextPeekBare() throws -> Token {
-        if peekindex >= stack.count {
+    private func nextPeekBare(count:Int = 0) throws -> Token {
+        if index + count >= stack.count {
             throw TokenGeneratorError.IndexError
         }
-        let l_index:Int = peekindex
-        ++peekindex
-        return stack[l_index]
+        return stack[index+count]
     }
-    func nextPeek() throws -> Token {
-        let token = try nextPeekBare()
+    func nextPeek(count:Int = 0) throws -> Token {
+        let token = try nextPeekBare(count)
         switch token.type {
         case .WhiteSpace, .LF:
-            return try nextPeek()
+            return try nextPeek(count+1)
         default:
             return token
         }
-    }
-    func resetPeek() {
-        peekindex = index
     }
 }
 

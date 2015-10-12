@@ -120,7 +120,6 @@ class CPPAnalyzer {
                     cppnodes.append(node)
                     */
                 default:
-                    gen.resetPeek()
                     break
                 }
                 let container = try parseContainer()
@@ -174,14 +173,12 @@ class CPPAnalyzer {
                     throw CPPError.Invalid("")
                 }
             } else {
-                gen.resetPeek()
                 return nil
             }
             return CPPNode(tokenType: .ExposeLevel, string: str) 
         default:
             break
         }
-        gen.resetPeek()
         return nil
     }
     // MARK: - 
@@ -197,28 +194,30 @@ class CPPAnalyzer {
             } else if str == "enum" {
                 node = CPPNode(tokenType: .Enum)
             } else {
-                gen.resetPeek()
                 return nil
             }
             try gen.next()
+            var i:Int = 0
             while true {
-                let token = try gen.next()
+                let token = try gen.nextPeek(i)
                 switch token.type {
                 case .Word(let def):
                     node!.string = def
                 case .LBrace:
+                    assert(i >= 1)
+                    try gen.next(i-1)
                     return node
                 default:
                     print("\(token.pos)") 
                     throw CPPError.InvalidClassDefinition 
                 }
+                ++i
             }
         case .LF:
             assert(false)
         default: 
             break
         }
-        gen.resetPeek()
         return nil
     }
     
@@ -260,7 +259,6 @@ class CPPAnalyzer {
         default: 
             break
         }
-        gen.resetPeek()
         return nil
     }
     
