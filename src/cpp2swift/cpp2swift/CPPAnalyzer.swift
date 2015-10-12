@@ -17,8 +17,8 @@ enum CPPTokenType {
     case Method         // メソッド宣言, ()があること {}の部分は含まない   (の直前まで
     case Variable(info:VariableInfo)       // 変数宣言                 ;の直前まで
     case Preprocessor   // #で始まる                LFの直前まで
-    //case LBrace         // {
-    //case RBrace         // }
+    case LBrace         // {
+    case RBrace         // }
     //case LParen         // (
     //case RParen         // )
     //case Body           // {}で囲まれた部分
@@ -98,20 +98,45 @@ class CPPAnalyzer {
                     cppnodes.append(t)
                     continue
                 }
+                
+                let cur:Token = try gen.nextPeek()
+                switch cur.type {
+                case .LBrace:
+                    let node = CPPNode(tokenType: .LBrace)
+                    cppnodes.append(node)
+                    try gen.next()
+                    continue
+                case .RBrace:
+                    let node = CPPNode(tokenType: .RBrace)
+                    cppnodes.append(node)
+                    try gen.next()
+                    continue
+                    /*
+                case .LParen:
+                    let node = CPPNode(tokenType: .LParen)
+                    cppnodes.append(node)
+                case .RParen:
+                    let node = CPPNode(tokenType: .RParen)
+                    cppnodes.append(node)
+                    */
+                default:
+                    gen.resetPeek()
+                    break
+                }
                 let container = try parseContainer()
                 if let t = container {
                     cppnodes.append(t)
                     continue
                 }
-                /*
-                let exposelevel = parseExposeLevel()
+                let exposelevel = try parseExposeLevel()
                 if let t = exposelevel {
-                    cpptokens.append(t)
+                    cppnodes.append(t)
                     continue
                 }
+                /*
                 let method = parseMethod()
                 if let t = method {
-                    cpptokens.append(t)
+                    cppnodes.append(t)
                     continue
                 }
                 */
@@ -132,7 +157,34 @@ class CPPAnalyzer {
             print("\(node)")
         }
     }
-    // MARK: - 単独のCPPTokenを戻す
+    func parseExposeLevel() throws -> CPPNode? {
+        let cur:Token = try gen.nextPeek()
+        switch cur.type {
+        case .Word(let str):
+            if str == "protected" ||
+               str == "public" ||
+               str == "private" 
+            { 
+                try gen.next()
+                let t = try gen.next()
+                switch t.type {
+                case .Colon:
+                    break
+                default:
+                    throw CPPError.Invalid("")
+                }
+            } else {
+                gen.resetPeek()
+                return nil
+            }
+            return CPPNode(tokenType: .ExposeLevel, string: str) 
+        default:
+            break
+        }
+        gen.resetPeek()
+        return nil
+    }
+    // MARK: - 
     func parseContainer() throws -> CPPNode? {
         let cur:Token = try gen.nextPeek()
         switch cur.type {
@@ -140,11 +192,12 @@ class CPPAnalyzer {
             var node:CPPNode?
             if str == "struct" {
                 node = CPPNode(tokenType: .Struct)
-            } else if str == "enum" {
-                node = CPPNode(tokenType: .Enum)
             } else if str == "class" {
                 node = CPPNode(tokenType: .Class)
+            } else if str == "enum" {
+                node = CPPNode(tokenType: .Enum)
             } else {
+                gen.resetPeek()
                 return nil
             }
             try gen.next()
@@ -163,8 +216,9 @@ class CPPAnalyzer {
         case .LF:
             assert(false)
         default: 
-            gen.resetPeek()
+            break
         }
+        gen.resetPeek()
         return nil
     }
     
@@ -204,8 +258,9 @@ class CPPAnalyzer {
             assert(false)
             break
         default: 
-            gen.resetPeek()
+            break
         }
+        gen.resetPeek()
         return nil
     }
     
