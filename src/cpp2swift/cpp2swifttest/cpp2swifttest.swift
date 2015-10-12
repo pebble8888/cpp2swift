@@ -186,11 +186,11 @@ class cpp2swifttest: XCTestCase {
         "        bool           mHasLock;\n" +
         "    };\n" +
         "};\n"
-        //let str1 = ""
         let t:Tokenizer = Tokenizer()
         t.parse(str0)
         //XCTAssertEqual(_parser.parse(str0), str1)
         let a:CPPAnalyzer = CPPAnalyzer()
-        a.analyze(&t.stack)
+        let gen:TokenGenerator = TokenGenerator(stack: t.stack)
+        a.analyze(gen)
     }
 }

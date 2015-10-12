@@ -8,7 +8,63 @@
 
 import Foundation
 
+enum CPPTokenType {
+    case Enum           // enum定義                 ;の直前または{の直前まで
+    case Struct         // struct定義               ;の直前または{の直前まで
+    case Class          // クラス定義                ;の直前または{の直前まで
+    case Comment        // ソースコメント              コメントの終わりまで
+    case ExposeLevel    // クラス公開レベル指定       カンマまで
+    case Method         // メソッド宣言, ()があること {}の部分は含まない   (の直前まで
+    case Variable(info:VariableInfo)       // 変数宣言                 ;の直前まで
+    case Preprocessor   // #で始まる                LFの直前まで
+    //case LBrace         // {
+    //case RBrace         // }
+    //case LParen         // (
+    //case RParen         // )
+    //case Body           // {}で囲まれた部分
+    case ClassInit      // クラス初期化指定子 ( クラス定義の後ろの : からカンマが終わるところまで ;の直前または{の直前まで
+    case BlankLine      // 改行のみからなる行
+    case RootBlock      // ルートブロック
+    case Other          // その他
+}
+
+enum VariableType {
+    case Normal
+    case Pointer
+    case Reference
+    case DoublePointer
+}
+
+struct VariableInfo {
+    var variableType:VariableType = .Normal
+    var const:Bool = false
+    var pointerConst:Bool = false
+    var reference:Bool = false
+    init()
+    {
+    }
+}
+
+// これがASTNodeの意味
+class CPPNode: CustomStringConvertible {
+    var tokenType:CPPTokenType
+    var string:String
+    init(tokenType:CPPTokenType, string:String = ""){
+        self.tokenType = tokenType
+        self.string = string
+    }
+    var description: String {
+        return "\(tokenType) \(string)"
+    }
+}
+
+
 class CPPAnalyzer {
+    
+    enum CPPError : ErrorType {
+        case Invalid(String)
+        case InvalidClassDefinition
+    }
     
     /*
     enum CPPElementType {
@@ -27,53 +83,130 @@ class CPPAnalyzer {
         case BlankLine      // 改行のみの行
     }
     */
-
+    var cppnodes:[CPPNode] = []
+    var gen:TokenGenerator!
     
-    func analyze(inout tokenstack:TokenStack){
-        var cpptokens:[CPPToken] = []
-        var i:Int = 0
-        i = tokenstack.nextNonWSLF(i)
-        while i < tokenstack.count {
-            let container = tokenstack.isContainer(i)
-            if let t = container.0 {
-                cpptokens.append(t)
-                i = container.1
-                continue
+    func analyze(gen:TokenGenerator){
+        self.cppnodes.removeAll()
+        self.gen = gen
+        
+        do {
+            while true {
+                // コメント判定が最初
+                let comment = try parseComment()
+                if let t = comment {
+                    cppnodes.append(t)
+                    continue
+                }
+                let container = try parseContainer()
+                if let t = container {
+                    cppnodes.append(t)
+                    continue
+                }
+                /*
+                let exposelevel = parseExposeLevel()
+                if let t = exposelevel {
+                    cpptokens.append(t)
+                    continue
+                }
+                let method = parseMethod()
+                if let t = method {
+                    cpptokens.append(t)
+                    continue
+                }
+                */
+                
+                //print("pos \(pos) \(tokenstack[pos])")
+                //assert(false)
+                let token = try gen.next()
+                let t = CPPNode(tokenType: .Other, string: "\(token.type)")
+                cppnodes.append(t)
             }
-            let comment = tokenstack.isComment(i)
-            if let t = comment.0 {
-                cpptokens.append(t)
-                i = comment.1
-                continue
-            }
-            let exposelevel = tokenstack.isExposeLevel(i)
-            if let t = exposelevel.0 {
-                cpptokens.append(t)
-                i = exposelevel.1
-                continue
-            }
-            let delimiter = tokenstack.isDelimiter(i)
-            if let t = delimiter.0 {
-                cpptokens.append(t)
-                i = delimiter.1
-                continue
-            }
-            let method = tokenstack.isMethod(i)
-            if let t = method.0 {
-                cpptokens.append(t)
-                i = method.1
-                continue
-            }
-            
-            //print("i \(i) \(tokenstack[i])")
-            //assert(false)
-            let t = CPPToken(tokenType: .Other, string: "\(tokenstack[i].type)")
-            cpptokens.append(t)
-            ++i
-            i = tokenstack.nextNonWSLF(i)
+        } catch TokenGeneratorError.IndexError {
+            //print("Index Error!")
+            // 終了
+        } catch {
+            print("Error!")
         }
-        for cpptoken in cpptokens {
-            print("\(cpptoken)")
+        for node in cppnodes {
+            print("\(node)")
         }
     }
+    // MARK: - 単独のCPPTokenを戻す
+    func parseContainer() throws -> CPPNode? {
+        let cur:Token = try gen.nextPeek()
+        switch cur.type {
+        case .Word(let str):
+            var node:CPPNode?
+            if str == "struct" {
+                node = CPPNode(tokenType: .Struct)
+            } else if str == "enum" {
+                node = CPPNode(tokenType: .Enum)
+            } else if str == "class" {
+                node = CPPNode(tokenType: .Class)
+            } else {
+                return nil
+            }
+            try gen.next()
+            while true {
+                let token = try gen.next()
+                switch token.type {
+                case .Word(let def):
+                    node!.string = def
+                case .LBrace:
+                    return node
+                default:
+                    print("\(token.pos)") 
+                    throw CPPError.InvalidClassDefinition 
+                }
+            }
+        case .LF:
+            assert(false)
+        default: 
+            gen.resetPeek()
+        }
+        return nil
+    }
+    
+    func parseComment() throws -> CPPNode? {
+        let cur:Token = try gen.nextPeek()
+        switch cur.type {
+        case .CommentOne:
+            // 改行コードまでコメント
+            let node:CPPNode = CPPNode(tokenType: .Comment)
+            try gen.next()
+            while true {
+                let token = try gen.nextBare()
+                switch token.type {
+                case .LF:
+                    node.string += token.type.asis
+                    return node
+                default:
+                    node.string += token.type.asis
+                }
+            }
+            assert(false)
+            break
+        case .CommentIn:
+            // CommentOutまでコメント
+            let node:CPPNode = CPPNode(tokenType: .Comment)
+            try gen.next()
+            while true {
+                let token = try gen.nextBare()
+                switch token.type {
+                case .CommentOut:
+                    node.string += token.type.asis
+                    return node
+                default:
+                    node.string += token.type.asis
+                }
+            }
+            assert(false)
+            break
+        default: 
+            gen.resetPeek()
+        }
+        return nil
+    }
+    
 }

@@ -8,71 +8,11 @@
 
 import Foundation
 
-enum CPPTokenType {
-    case Enum           // enum定義                 ;の直前または{の直前まで
-    case Struct         // struct定義               ;の直前または{の直前まで
-    case Class          // クラス定義                ;の直前または{の直前まで
-    case Comment        // ソースコメント              コメントの終わりまで
-    case ExposeLevel    // クラス公開レベル指定       カンマまで
-    case Method         // メソッド宣言, ()があること {}の部分は含まない   (の直前まで
-    case Variable(info:VariableInfo)       // 変数宣言                 ;の直前まで
-    case Macro          // #で始まる                LFの直前まで
-    case LBrace         // {
-    case RBrace         // }
-    case LParen         // (
-    case RParen         // )
-    //case Body           // {}で囲まれた部分
-    case ClassInit      // クラス初期化指定子 ( クラス定義の後ろの : からカンマが終わるところまで ;の直前または{の直前まで
-    case BlankLine      // 改行のみの行
-    case Other          // その他
-}
+//extension TokenStack {
 
-enum VariableType {
-    case Normal
-    case Pointer
-    case Reference
-    case DoublePointer
-}
-
-struct VariableInfo {
-    var variableType:VariableType = .Normal
-    var const:Bool = false
-    var pointerConst:Bool = false
-    var reference:Bool = false
-    init()
-    {
-    }
-}
-
-class CPPToken: CustomStringConvertible {
-    var tokenType:CPPTokenType
-    var string:String
-    init(tokenType:CPPTokenType, string:String = ""){
-        self.tokenType = tokenType
-        self.string = string
-    }
-    var description: String {
-        return "\(tokenType) \(string)"
-    }
-}
-
-extension TokenStack {
-    // 現在位置がWSでもLFでもなければそれを返す
-    func nextNonWSLF(begin:Int) -> Int {
-        var i = begin
-        loop: for ; i < self.count; ++i {
-            switch tokenTypeAtIndex(i) {
-            case .WhiteSpace, .LF:
-                break
-            default:
-                break loop
-            }
-        }
-        return i
-    }
-
+    /*
     // MARK: - 単独のCPPTokenを戻す
-    func isContainer(begin:Int) -> (CPPToken?, Int) {
+    func parseContainer(begin:Int) -> (CPPToken?, Int) {
         var i = begin
         var cpptoken:CPPToken?
         if i == self.count {
@@ -104,8 +44,10 @@ extension TokenStack {
         }
         return (nil,begin)
     }
+    */
     
-    func isComment(begin:Int) -> (CPPToken?, Int) {
+    /*
+    func parseComment(begin:Int) -> (CPPToken?, Int) {
         var i = begin
         var cpptoken:CPPToken?
         if i == self.count {
@@ -147,7 +89,7 @@ extension TokenStack {
         }
         return (nil, begin)
     }
-    func isExposeLevel(begin:Int) -> (CPPToken?, Int) {
+    func parseExposeLevel(begin:Int) -> (CPPToken?, Int) {
         var i = begin
         if i == self.count {
             return (nil, begin)
@@ -180,6 +122,7 @@ extension TokenStack {
         }
         return (nil, begin)
     }
+    /*
     func isDelimiter(begin:Int) -> (CPPToken?, Int) {
         if begin == self.count {
             return (nil, begin)
@@ -198,9 +141,9 @@ extension TokenStack {
             break
         }
         return (nil, begin)
-        
     }
-    func isMethod(begin:Int) -> (CPPToken?, Int) {
+    */
+    func parseMethod(begin:Int) -> (CPPToken?, Int) {
         var i = begin
         if i == self.count {
             return (nil, begin)
@@ -227,31 +170,25 @@ extension TokenStack {
         }
         return (nil, begin)
     }
-    func isVariable(begin:Int) -> (CPPToken?, Int) {
+    func parseVariable(begin:Int) -> (CPPToken?, Int) {
         var i = begin
         for ; i < self.count; ++i {
         }
         return (nil, begin)
     }
-    func isMacro(begin:Int) -> (CPPToken?, Int) {
+    func parsePreprocessor(begin:Int) -> (CPPToken?, Int) {
         var i = begin
         for ; i < self.count; ++i {
         }
         return (nil, begin)
     }
-    func isBody(begin:Int) -> (CPPToken?, Int) {
+    func parseClassInit(begin:Int) -> (CPPToken?, Int) {
         var i = begin
         for ; i < self.count; ++i {
         }
         return (nil, begin)
     }
-    func isClassInit(begin:Int) -> (CPPToken?, Int) {
-        var i = begin
-        for ; i < self.count; ++i {
-        }
-        return (nil, begin)
-    }
-    func isBlankLine(begin:Int) -> (CPPToken?, Int) {
+    func parseBlankLine(begin:Int) -> (CPPToken?, Int) {
         var i = begin
         for ; i < self.count; ++i {
         }
@@ -259,7 +196,7 @@ extension TokenStack {
     }
     
     // MARK : - 複数CPPTokenを戻す
-    func inMethodParen(begin:Int) -> ([CPPToken], Int) {
+    func parseMethodParen(begin:Int) -> ([CPPToken], Int) {
         var cpptokens:[CPPToken] = []
         var i = begin
         if i == self.count {
@@ -274,9 +211,5 @@ extension TokenStack {
 
         return (cpptokens, begin)
     }
-}
-
-
-
-class CPPTokenizer {
-}
+    */
+//}

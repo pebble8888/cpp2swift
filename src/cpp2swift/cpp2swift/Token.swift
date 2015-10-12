@@ -133,11 +133,11 @@ enum TokenType {
             return str
         case TwoColon:       // ::
             return "::"
-        case CommentIn:      // /*
+        case CommentIn:      //
             return "/*"
-        case CommentOut:     // */
+        case CommentOut:     //
             return "*/"
-        case CommentOne:     // //
+        case CommentOne:     //
             return "//"
         case WhiteSpace(let str): //
             return str
@@ -195,7 +195,7 @@ enum TokenType {
 }
 
 class Tokenizer {
-    var stack: TokenStack = TokenStack()
+    var stack: [Token] = []
     func parse(str:String){
         var i:String.Index = str.startIndex
         var line:UInt = 1
@@ -215,32 +215,77 @@ class Tokenizer {
             }
         }
         
-        /*
         // debug
+        /*
         for t in stack {
-            //print("\(t.type) \(t.pos)")
-            //print("\(t.type)")
+            print("\(t.type)")
         }
         */
     }
 }
 
-struct TokenStack {
-    var stack:[Token] = []
-    mutating func append(token:Token){
-        stack.append(token)
-    }
-    var count: Int {
-        return stack.count
-    }
-    subscript (i: Int) -> Token
-    {
-        return stack[i]
-    }
-    func tokenTypeAtIndex(i: Int) -> TokenType
-    {
-        return self[i].type
-    }
+
+
+enum TokenGeneratorError : ErrorType
+{
+    case IndexError
 }
 
+class TokenGenerator {
+    private var stack:[Token] = []
+    private var index: Int = 0
+    private var peekindex : Int = 0
+    init(stack:[Token]) {
+        self.stack = stack
+    }
+    var currentIndex: Int {
+        return index
+    }
+    /*
+    func current() throws -> Token {
+        if index >= stack.count {
+            throw TokenGeneratorError.IndexError
+        }
+        return stack[index] 
+    }
+    */
+    func nextBare() throws -> Token {
+        if index >= stack.count {
+            throw TokenGeneratorError.IndexError 
+        }
+        let l_index:Int = index
+        ++index
+        resetPeek()
+        return stack[l_index]
+    }
+    func next() throws -> Token {
+        let token = try nextBare() 
+        switch token.type {
+        case .WhiteSpace, .LF:
+            return try next()
+        default:
+            return token
+        }
+    }
+    func nextPeekBare() throws -> Token {
+        if peekindex >= stack.count {
+            throw TokenGeneratorError.IndexError
+        }
+        let l_index:Int = peekindex
+        ++peekindex
+        return stack[l_index]
+    }
+    func nextPeek() throws -> Token {
+        let token = try nextPeekBare()
+        switch token.type {
+        case .WhiteSpace, .LF:
+            return try nextPeek()
+        default:
+            return token
+        }
+    }
+    func resetPeek() {
+        peekindex = index
+    }
+}
 
