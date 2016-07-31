@@ -29,4 +29,6 @@ var g_tokenizer = Tokenizer()
 g_tokenizer.parse(g_str)
 var g_cppAnalyzer = CPPAnalyzer()
 //g_cppAnalyzer.analyze(g_tokenizer.stack)
-g_cppAnalyzer.analyze(&g_tokenizer.stack)
+let gen:TokenGenerator = TokenGenerator(stack: g_tokenizer.stack)
+g_cppAnalyzer.analyze(gen)
+
